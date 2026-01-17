@@ -45,6 +45,22 @@ pnpm run dev    # Watch mode
 pnpm run build  # Production build
 ```
 
+## Publishing
+
+To publish a new version to the VSCode Marketplace:
+
+1. Create a `.env` file in the project root (see `.env.example`)
+2. Add your VSCE Personal Access Token:
+   ```
+   VSCE_PAT=your-token-here
+   ```
+3. Run the release command:
+   ```bash
+   pnpm run release
+   ```
+
+**Note**: Never commit your `.env` file. It's already in `.gitignore` to prevent accidental leaks.
+
 ## Installation
 
 1. Clone this repository

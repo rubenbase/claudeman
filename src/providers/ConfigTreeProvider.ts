@@ -125,7 +125,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
     if (element?.id === 'project-skills') {
       const skillsDir = await this.configManager.getProjectSkillsDir();
       if (skillsDir) {
-        return await this.getDirectoryChildren(skillsDir);
+        return await this.getDirectoryChildren(skillsDir, true);
       }
     }
 
@@ -133,7 +133,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
     if (element?.id === 'project-mcp') {
       const mcpDir = await this.configManager.getProjectMcpDir();
       if (mcpDir) {
-        return await this.getDirectoryChildren(mcpDir);
+        return await this.getDirectoryChildren(mcpDir, false);
       }
     }
 
@@ -170,7 +170,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
     if (element?.id === 'global-skills') {
       const skillsDir = await this.configManager.getGlobalSkillsDir();
       if (skillsDir) {
-        return await this.getDirectoryChildren(skillsDir);
+        return await this.getDirectoryChildren(skillsDir, true);
       }
     }
 
@@ -178,22 +178,23 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
     if (element?.id === 'global-mcp') {
       const mcpDir = await this.configManager.getGlobalMcpDir();
       if (mcpDir) {
-        return await this.getDirectoryChildren(mcpDir);
+        return await this.getDirectoryChildren(mcpDir, false);
       }
     }
 
     // Handle recursive folder/file children
-    if (element?.contextValue === 'folder') {
+    if (element?.contextValue === 'folder' || element?.contextValue === 'skill-folder') {
       const folderPath = element.resourceUri?.fsPath;
       if (folderPath) {
-        return await this.getDirectoryChildren(folderPath);
+        // Don't pass isSkillsFolder=true for nested folders
+        return await this.getDirectoryChildren(folderPath, false);
       }
     }
 
     return [];
   }
 
-  private async getDirectoryChildren(dirPath: string): Promise<ConfigItem[]> {
+  private async getDirectoryChildren(dirPath: string, isSkillsFolder: boolean = false): Promise<ConfigItem[]> {
     try {
       const entries = await fs.readdir(dirPath, { withFileTypes: true });
       const items: ConfigItem[] = [];
@@ -202,6 +203,9 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
         const fullPath = path.join(dirPath, entry.name);
         const isDirectory = entry.isDirectory();
 
+        // Mark top-level folders in skills directory as 'skill-folder'
+        const contextValue = isSkillsFolder && isDirectory ? 'skill-folder' : (isDirectory ? 'folder' : 'file');
+
         items.push(
           new ConfigItem(
             entry.name,
@@ -209,7 +213,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
             'claudeman.openFile',
             isDirectory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
             fullPath, // Use full path as unique ID
-            isDirectory ? 'folder' : 'file',
+            contextValue,
             vscode.Uri.file(fullPath),
             isDirectory ? 'folder' : 'file'
           )
@@ -218,8 +222,10 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
 
       return items.sort((a, b) => {
         // Folders first, then files, both alphabetically
-        if (a.contextValue === 'folder' && b.contextValue !== 'folder') return -1;
-        if (a.contextValue !== 'folder' && b.contextValue === 'folder') return 1;
+        const aIsFolder = a.contextValue === 'folder' || a.contextValue === 'skill-folder';
+        const bIsFolder = b.contextValue === 'folder' || b.contextValue === 'skill-folder';
+        if (aIsFolder && !bIsFolder) return -1;
+        if (!aIsFolder && bIsFolder) return 1;
         return a.label.localeCompare(b.label);
       });
     } catch (error) {

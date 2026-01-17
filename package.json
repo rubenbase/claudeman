@@ -38,6 +38,11 @@
         "command": "claudeman.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "claudeman.copySkillName",
+        "title": "Copy Skill Name",
+        "icon": "$(copy)"
       }
     ],
     "viewsContainers": {
@@ -64,6 +69,13 @@
           "when": "view == claudeman.configView",
           "group": "navigation"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "claudeman.copySkillName",
+          "when": "view == claudeman.configView && viewItem == skill-folder",
+          "group": "inline"
+        }
       ]
     }
   },
@@ -72,7 +84,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint src --ext ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release": "pnpm run build && vsce publish -p $VSCE_PAT"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

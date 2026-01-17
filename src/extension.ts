@@ -338,6 +338,20 @@ export function activate(context: vscode.ExtensionContext) {
       }
     })
   );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('claudeman.copySkillName', async (item: vscode.TreeItem) => {
+      if (item?.label) {
+        const skillName = typeof item.label === 'string' ? item.label : item.label.label;
+        try {
+          await vscode.env.clipboard.writeText(skillName);
+          vscode.window.showInformationMessage(`Copied skill name: ${skillName}`);
+        } catch (error) {
+          vscode.window.showErrorMessage(`Failed to copy skill name: ${error}`);
+        }
+      }
+    })
+  );
 }
 
 export function deactivate() {}
