@@ -63,6 +63,17 @@ To publish a new version to the VSCode Marketplace:
 
 ## Installation
 
+### From VSCode Marketplace
+
+1. Open VS Code
+2. Go to Extensions (Cmd+Shift+X / Ctrl+Shift+X)
+3. Search for "Claudeman"
+4. Click Install
+
+Or visit: [Claudeman on VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=gobrand.claudeman)
+
+### From Source
+
 1. Clone this repository
 2. Run `pnpm install`
 3. Run `pnpm run build`
