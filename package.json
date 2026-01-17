@@ -1,0 +1,89 @@
+{
+  "name": "claudeman",
+  "displayName": "Claudeman",
+  "description": "Manage Claude AI configuration (global settings and per-project CLAUDE.md files)",
+  "version": "0.0.1",
+  "publisher": "gobrand",
+  "icon": "resources/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gobrand/claudeman"
+  },
+  "license": "ISC",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "claudeman.openSettings",
+        "title": "Claude: Open Configuration Manager"
+      },
+      {
+        "command": "claudeman.editProjectConfig",
+        "title": "Claude: Edit Project Configuration"
+      },
+      {
+        "command": "claudeman.editGlobalConfig",
+        "title": "Claude: Edit Global Configuration"
+      },
+      {
+        "command": "claudeman.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "claudeman",
+          "title": "Claude Config",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "claudeman": [
+        {
+          "id": "claudeman.configView",
+          "name": "Configuration"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "claudeman.refresh",
+          "when": "view == claudeman.configView",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run build",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --ext ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^8.56.0",
+    "sharp": "^0.34.5",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@10.15.1"
+}
