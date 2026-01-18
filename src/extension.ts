@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'node:path';
 import { ConfigTreeProvider } from './providers/ConfigTreeProvider';
 import { ConfigManager } from './services/ConfigManager';
 
@@ -349,6 +350,159 @@ export function activate(context: vscode.ExtensionContext) {
         } catch (error) {
           vscode.window.showErrorMessage(`Failed to copy skill name: ${error}`);
         }
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('claudeman.newFolder', async (item: vscode.TreeItem & { resourceUri?: vscode.Uri; contextValue?: string }) => {
+      if (!item?.resourceUri) {
+        vscode.window.showErrorMessage('Cannot create folder: invalid location');
+        return;
+      }
+
+      const folderName = await vscode.window.showInputBox({
+        prompt: 'Enter folder name',
+        placeHolder: 'my-folder',
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return 'Folder name cannot be empty';
+          }
+          if (value.includes('/') || value.includes('\\')) {
+            return 'Folder name cannot contain slashes';
+          }
+          if (value.startsWith('.')) {
+            return 'Folder name cannot start with a dot';
+          }
+          return null;
+        }
+      });
+
+      if (!folderName) {
+        return;
+      }
+
+      try {
+        const newFolderUri = vscode.Uri.joinPath(item.resourceUri, folderName);
+        await vscode.workspace.fs.createDirectory(newFolderUri);
+        vscode.window.showInformationMessage(`Created folder: ${folderName}`);
+        treeProvider.refresh();
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to create folder: ${error}`);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('claudeman.newFile', async (item: vscode.TreeItem & { resourceUri?: vscode.Uri; contextValue?: string }) => {
+      if (!item?.resourceUri) {
+        vscode.window.showErrorMessage('Cannot create file: invalid location');
+        return;
+      }
+
+      const fileName = await vscode.window.showInputBox({
+        prompt: 'Enter file name',
+        placeHolder: 'file.txt',
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return 'File name cannot be empty';
+          }
+          if (value.includes('/') || value.includes('\\')) {
+            return 'File name cannot contain slashes';
+          }
+          if (value.startsWith('.')) {
+            return 'File name cannot start with a dot';
+          }
+          return null;
+        }
+      });
+
+      if (!fileName) {
+        return;
+      }
+
+      try {
+        const newFileUri = vscode.Uri.joinPath(item.resourceUri, fileName);
+        await vscode.workspace.fs.writeFile(newFileUri, Buffer.from('', 'utf8'));
+        const doc = await vscode.workspace.openTextDocument(newFileUri);
+        await vscode.window.showTextDocument(doc);
+        vscode.window.showInformationMessage(`Created file: ${fileName}`);
+        treeProvider.refresh();
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to create file: ${error}`);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('claudeman.rename', async (item: vscode.TreeItem & { resourceUri?: vscode.Uri; contextValue?: string }) => {
+      if (!item?.resourceUri) {
+        vscode.window.showErrorMessage('Cannot rename: invalid item');
+        return;
+      }
+
+      const currentName = path.basename(item.resourceUri.fsPath);
+      const newName = await vscode.window.showInputBox({
+        prompt: 'Enter new name',
+        value: currentName,
+        valueSelection: [0, currentName.lastIndexOf('.') > 0 ? currentName.lastIndexOf('.') : currentName.length],
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return 'Name cannot be empty';
+          }
+          if (value.includes('/') || value.includes('\\')) {
+            return 'Name cannot contain slashes';
+          }
+          if (value === currentName) {
+            return 'Name must be different from current name';
+          }
+          return null;
+        }
+      });
+
+      if (!newName || newName === currentName) {
+        return;
+      }
+
+      try {
+        const parentDir = vscode.Uri.file(path.dirname(item.resourceUri.fsPath));
+        const newUri = vscode.Uri.joinPath(parentDir, newName);
+        await vscode.workspace.fs.rename(item.resourceUri, newUri, { overwrite: false });
+        vscode.window.showInformationMessage(`Renamed to: ${newName}`);
+        treeProvider.refresh();
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to rename: ${error}`);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('claudeman.delete', async (item: vscode.TreeItem & { resourceUri?: vscode.Uri; contextValue?: string }) => {
+      if (!item?.resourceUri) {
+        vscode.window.showErrorMessage('Cannot delete: invalid item');
+        return;
+      }
+
+      const itemName = path.basename(item.resourceUri.fsPath);
+      const itemType = item.contextValue === 'folder' || item.contextValue === 'skill-folder' ? 'folder' : 'file';
+
+      const confirmation = await vscode.window.showWarningMessage(
+        `Are you sure you want to delete ${itemType} "${itemName}"?`,
+        { modal: true },
+        'Delete',
+        'Cancel'
+      );
+
+      if (confirmation !== 'Delete') {
+        return;
+      }
+
+      try {
+        await vscode.workspace.fs.delete(item.resourceUri, { recursive: true, useTrash: true });
+        vscode.window.showInformationMessage(`Deleted: ${itemName}`);
+        treeProvider.refresh();
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to delete: ${error}`);
       }
     })
   );

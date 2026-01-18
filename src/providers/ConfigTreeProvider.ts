@@ -47,6 +47,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
       const hasGlobal = await this.configManager.hasGlobalConfig();
       const hasProject = await this.configManager.hasProjectConfig();
       const hasProjectFolder = await this.configManager.hasProjectClaudeFolder();
+      const globalDir = this.configManager.getGlobalConfigDir();
+      const projectDir = await this.configManager.getProjectClaudeDir();
 
       return [
         new ConfigItem(
@@ -55,8 +57,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
           'claudeman.createGlobalClaudeFolder',
           hasGlobalFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           'global-folder',
-          undefined,
-          undefined,
+          'global-claude-folder',
+          hasGlobalFolder ? vscode.Uri.file(globalDir) : undefined,
           'root-folder'
         ),
         new ConfigItem(
@@ -85,8 +87,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
           'claudeman.createProjectClaudeFolder',
           hasProjectFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           'project-folder',
-          undefined,
-          undefined,
+          'project-claude-folder',
+          hasProjectFolder && projectDir ? vscode.Uri.file(projectDir) : undefined,
           'root-folder'
         ),
       ];
@@ -96,6 +98,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
     if (element?.id === 'project-folder') {
       const hasSkills = await this.configManager.hasProjectSkills();
       const hasMcp = await this.configManager.hasProjectMcp();
+      const skillsDir = await this.configManager.getProjectSkillsDir();
+      const mcpDir = await this.configManager.getProjectMcpDir();
 
       return [
         new ConfigItem(
@@ -104,8 +108,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
           'claudeman.createProjectSkills',
           hasSkills ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           'project-skills',
-          undefined,
-          undefined,
+          'skills-folder',
+          skillsDir ? vscode.Uri.file(skillsDir) : undefined,
           'skills'
         ),
         new ConfigItem(
@@ -114,8 +118,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
           'claudeman.createProjectMcp',
           hasMcp ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           'project-mcp',
-          undefined,
-          undefined,
+          'mcp-folder',
+          mcpDir ? vscode.Uri.file(mcpDir) : undefined,
           'mcp'
         ),
       ];
@@ -141,6 +145,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
     if (element?.id === 'global-folder') {
       const hasSkills = await this.configManager.hasGlobalSkills();
       const hasMcp = await this.configManager.hasGlobalMcp();
+      const skillsDir = await this.configManager.getGlobalSkillsDir();
+      const mcpDir = await this.configManager.getGlobalMcpDir();
 
       return [
         new ConfigItem(
@@ -149,8 +155,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
           'claudeman.createGlobalSkills',
           hasSkills ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           'global-skills',
-          undefined,
-          undefined,
+          'skills-folder',
+          skillsDir ? vscode.Uri.file(skillsDir) : undefined,
           'skills'
         ),
         new ConfigItem(
@@ -159,8 +165,8 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
           'claudeman.createGlobalMcp',
           hasMcp ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           'global-mcp',
-          undefined,
-          undefined,
+          'mcp-folder',
+          mcpDir ? vscode.Uri.file(mcpDir) : undefined,
           'mcp'
         ),
       ];

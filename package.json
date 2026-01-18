@@ -1,8 +1,8 @@
 {
   "name": "claudeman",
   "displayName": "Claudeman",
-  "description": "Manage Claude AI configuration (global settings and per-project CLAUDE.md files)",
-  "version": "0.0.1",
+  "description": "Manage Claude AI configuration, skills, and MCP servers with built-in file management",
+  "version": "0.0.4",
   "publisher": "gobrand",
   "icon": "resources/icon.png",
   "repository": {
@@ -43,6 +43,26 @@
         "command": "claudeman.copySkillName",
         "title": "Copy Skill Name",
         "icon": "$(copy)"
+      },
+      {
+        "command": "claudeman.newFolder",
+        "title": "New Folder",
+        "icon": "$(new-folder)"
+      },
+      {
+        "command": "claudeman.newFile",
+        "title": "New File",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "claudeman.rename",
+        "title": "Rename",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "claudeman.delete",
+        "title": "Delete",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -75,6 +95,26 @@
           "command": "claudeman.copySkillName",
           "when": "view == claudeman.configView && viewItem == skill-folder",
           "group": "inline"
+        },
+        {
+          "command": "claudeman.newFolder",
+          "when": "view == claudeman.configView && viewItem =~ /folder/",
+          "group": "1_create@1"
+        },
+        {
+          "command": "claudeman.newFile",
+          "when": "view == claudeman.configView && viewItem =~ /folder/",
+          "group": "1_create@2"
+        },
+        {
+          "command": "claudeman.rename",
+          "when": "view == claudeman.configView && viewItem =~ /(folder|file)/ && viewItem != global-claude-folder && viewItem != project-claude-folder && viewItem != skills-folder && viewItem != mcp-folder",
+          "group": "2_edit@1"
+        },
+        {
+          "command": "claudeman.delete",
+          "when": "view == claudeman.configView && viewItem =~ /(folder|file)/ && viewItem != global-claude-folder && viewItem != project-claude-folder && viewItem != skills-folder && viewItem != mcp-folder",
+          "group": "2_edit@2"
         }
       ]
     }

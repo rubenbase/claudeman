@@ -4,10 +4,13 @@ A lightweight VS Code/Cursor extension for managing Claude AI configuration file
 
 ## Features
 
-- **Global Configuration**: Manage your global Claude settings (`~/.config/claude/config.json`)
+- **Global Configuration**: Manage your global Claude settings (`~/.claude/settings.json`)
 - **Project Configuration**: Create and edit per-project `CLAUDE.md` instruction files
-- **Activity Bar View**: Quick access to both configuration types
+- **Skills & MCP Management**: Organize and manage Claude skills and MCP servers
+- **File Management**: Create, rename, and delete folders and files directly from the tree view
+- **Activity Bar View**: Quick access to all configuration types
 - **File Templates**: Auto-generated templates for new configuration files
+- **Tree View Navigation**: Hierarchical view of all Claude-related files and folders
 
 ## Commands
 
@@ -17,9 +20,22 @@ A lightweight VS Code/Cursor extension for managing Claude AI configuration file
 
 ## Usage
 
+### Basic Navigation
 1. Open the Claude Config activity bar icon (sidebar)
 2. Click on "Global Configuration" or "Project Configuration" to edit
 3. If files don't exist, the extension will offer to create them from templates
+
+### File Management
+Right-click on any folder in the tree view to:
+- **New Folder**: Create a new subfolder
+- **New File**: Create a new file and open it for editing
+- **Rename**: Rename folders or files
+- **Delete**: Delete folders or files (moved to trash for safety)
+
+### Skills & MCP Organization
+- Navigate to the Skills or MCP folders in either global (`~/.claude/`) or project (`.claude/`) locations
+- Use the context menu to create new skill folders or MCP configurations
+- Copy skill names by right-clicking on skill folders
 
 ## Project Configuration (CLAUDE.md)
 
@@ -31,11 +47,10 @@ The `CLAUDE.md` file lives in your project root and provides Claude with:
 
 ## Global Configuration
 
-Located at `~/.config/claude/config.json`, this stores:
-- API keys
-- Default model preferences
-- Token limits
-- Temperature settings
+Located at `~/.claude/settings.json`, this stores:
+- Permissions (allow/deny lists)
+- Environment variables
+- Global skills and MCP servers
 
 ## Development
 
